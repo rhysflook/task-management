@@ -1,7 +1,8 @@
 import { ActionReducerMapBuilder, createSlice, Draft, Slice, SliceCaseReducers, ValidateSliceCaseReducers } from "@reduxjs/toolkit";
 import { IRecords, tablesApi } from "../../services/tables";
-import { TableConfig } from "../../types/tables/table";
+import { TableColumn, TableConfig } from "../../types/tables/table";
 import { PayloadAction } from '@reduxjs/toolkit';
+import { selectFields } from "../../helpers/table";
 
 
 interface TableSlice<T> {
@@ -29,8 +30,8 @@ export const tableInitialState = {
 
 export const tableReducers = <T extends TableConfig>() => ({
 	getPage(state: Draft<T>, action?: PayloadAction<string>) {
-		console.log('triggered', action?.payload)
-	  state.queryString = `${state.name}/tableData?page=${action?.payload}&per_page=${state.meta.per_page}&fields=${state.fields?.join(',')}`;
+		const fields = selectFields(state.columns as TableColumn[]);
+		state.queryString = `${state.name}/tableData?page=${action?.payload}&per_page=${state.meta.per_page}&fields=${fields?.join(',')}`;
 	},
   });
 
@@ -43,10 +44,11 @@ export const tableExtraReducers = <T>(builder: ActionReducerMapBuilder<T>) => {
 }
 
 export function applyTableSlice<T extends TableConfig>({name, initialState, reducers, applyExtraReducers}: TableSlice<Partial<T>>): Slice<T> {
+	const fields = selectFields(initialState.columns as TableColumn[]);
 	const mergedInitialState: T = {
 		...tableInitialState,
 		...initialState as T,
-		queryString: `${name}/tableData?page=${tableInitialState.meta.current_page}&per_page=${tableInitialState.meta.per_page}&fields=${initialState.fields?.join(',')}`,
+		queryString: `${name}/tableData?page=${tableInitialState.meta.current_page}&per_page=${tableInitialState.meta.per_page}&fields=${fields?.join(',')}`,
 		name
 	};
 	const baseReducers = tableReducers<T>();
@@ -62,6 +64,7 @@ export function applyTableSlice<T extends TableConfig>({name, initialState, redu
 			if (applyExtraReducers) {
 				applyExtraReducers(builder);
 			}
-		}
+		},
+
 	});
 }

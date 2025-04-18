@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/api/test', [App\Http\Controllers\API\TestController::class, 'index']);
 Route::controller(ProjectController::class)->group(function() {
 	Route::prefix('api/projects')->group(function() {
-		Route::get('tableData', 'getPage');
+		// Route::get('tableData', 'getPage');
 		// Route::get('/', 'index');
 		// Route::get('/{project}', 'show');
 		// Route::post('/', 'store');

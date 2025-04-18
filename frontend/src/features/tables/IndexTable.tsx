@@ -1,6 +1,6 @@
 import Sheet from '@mui/joy/Sheet';
 import Table from '@mui/joy/Table';
-import { TableRow } from '../../types/tables/table';
+import { TableColumn, TableRow } from '../../types/tables/table';
 import Row from '../../features/tables/Row';
 import { useAppSelector } from '../../stores/hooks'
 import { sliceKey } from '../../stores/store';
@@ -13,12 +13,13 @@ interface TableProps {
 }
 
 const IndexTable: React.FC<TableProps> = ({ slice, containerStyles }) => {
-	let {headers, queryString, records, fields} = useAppSelector((state) => state[slice]);
+	let {columns, queryString, records} = useAppSelector((state) => state[slice]);
 
 	const { isLoading } = useGetRecordsQuery(queryString, {
 		refetchOnMountOrArgChange: true,
 	  });
 
+	const headers = columns.map((column) => column.label);
 
 	return <Sheet sx={containerStyles}>
 			<Table
@@ -30,13 +31,25 @@ const IndexTable: React.FC<TableProps> = ({ slice, containerStyles }) => {
 			>
 				{/* Table Header */}
 				<thead>
-					<tr>{headers.map((header: string, index: number) => <th key={index}>{header}</th>)}</tr>
+					<tr>{columns.map(
+							(column: TableColumn, index: number) =>
+								<th
+									key={index}
+									style={{
+										width: column.width,
+										textAlign: column.align,
+									}}
+								>
+									{column.label}
+								</th>
+						)}
+					</tr>
 				</thead>
 				<tbody>
 					{
 						isLoading  ?
 						<tr><td colSpan={3}>Loading...</td></tr> :
-						records.map((row: TableRow, index: number) => (<Row key={index} row={row} fields={fields}/>))}
+						records.map((row: TableRow, index: number) => (<Row key={index} row={row} columns={columns}/>))}
 				</tbody>
 			</Table>
 			<Navigation position={"center"} slice={slice}/>

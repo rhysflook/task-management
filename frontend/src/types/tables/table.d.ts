@@ -1,7 +1,6 @@
 export interface TableConfig {
 	name: string,
-	headers: string[],
-	fields: string[],
+	columns: TableColumn[],
 	queryString: string,
 	records : TableRow[],
 	links: {
@@ -22,9 +21,12 @@ export interface TableRow {
 }
 
 export interface TableColumn {
-	id: number;
-  	value: string;
-  	minWidth?: number;
-  	align?: 'right' | 'left' | 'center';
-  	format?: (value: number) => string;
+	key: string;             // the DB field name
+	label: string;          // label to show in the table header
+	width?: number | string; // optional column width
+	format?: 'text' | 'date' | 'currency' | 'boolean' | 'custom';
+	overflow?: boolean;      // true = ellipsis, false = wrap
+	align?: 'left' | 'center' | 'right';
+	notDBVal?: boolean;
+	render?: (column: number) => JSX.Element; // for custom rendering
 }

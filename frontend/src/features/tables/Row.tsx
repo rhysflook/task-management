@@ -1,19 +1,27 @@
-import Button from "@mui/joy/Button";
-import { TableRow } from "../../types/tables/table"
-import DashboardCustomizeTwoToneIcon from '@mui/icons-material/DashboardCustomizeTwoTone';
-
+import { TableColumn, TableRow } from "../../types/tables/table"
 
 interface RowProps {
 	row: TableRow;
-	fields: string[];
+	columns: TableColumn[];
 }
 
-const Row: React.FC<RowProps> = ({ row, fields }) => {
+const Row: React.FC<RowProps> = ({ row, columns }) => {
 return <tr>
-		{fields.map((field: string, index: number) => <td key={index}>{row[field]}</td>)}
-		<td style={{ minWidth: "200px", textAlign: "center" }}>
-			<Button><DashboardCustomizeTwoToneIcon /></Button>
-		</td>
+		{
+			columns.map((column: TableColumn, index: number) =>
+				<td
+					key={index}
+					style={{
+						width: column.width,
+						textAlign: column.align,
+						overflow: column.overflow ? 'hidden' : 'visible',
+						textOverflow: column.overflow ? 'ellipsis' : 'clip',
+						whiteSpace: column.overflow ? 'nowrap' : 'normal'
+					}}
+				>
+					{column.render ? column.render(row['id'] as number) : row[column.key]}
+				</td>)
+		}
 	</tr>
 }
 

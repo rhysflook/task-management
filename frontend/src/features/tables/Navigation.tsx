@@ -1,10 +1,10 @@
 import React, { JSX } from "react";
 import { useAppDispatch, useAppSelector } from "../../stores/hooks";
 import { sliceKey } from "../../stores/store";
-import { Button, Stack } from "@mui/joy";
+import { Button, Option, Select, Stack } from "@mui/joy";
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { getPage } from "../../stores/reducers/projectSlice";
+import { getPage, setPerPage } from "../../stores/reducers/projectSlice";
 
 interface NavigationProps {
 	position: string;
@@ -12,7 +12,16 @@ interface NavigationProps {
 }
 
 const Navigation: React.FC<NavigationProps> = ({position = 'center', slice}) => {
-	const {last_page, current_page} = useAppSelector((state) => state[slice].meta);
+	const {last_page, current_page, per_page} = useAppSelector((state) => {
+		if (!state[slice].table) {
+			return {
+				last_page: 1,
+				current_page: 1,
+				per_page: 5
+			}
+		}
+		return state[slice].table.meta
+	});
 	// const {prev, next} = useAppSelector((state) => state[slice].links);
 	const dispatch = useAppDispatch();
 	const visibleBtns = () => {
@@ -48,6 +57,23 @@ const Navigation: React.FC<NavigationProps> = ({position = 'center', slice}) => 
 			<ArrowRightIcon />
 		</Button>
 		}
+		<Select
+			sx={{
+				width: "100px",
+				marginLeft: "20px",
+				"& button:focus, & button:focus-visible": { outline: "none" }
+			}}
+			value={"" + per_page}
+			onChange={(_, newValue) => {
+				if (newValue) {
+					dispatch(setPerPage(newValue));
+				}
+			}}
+		>
+				<Option value="5">5</Option>
+				<Option value="10">10</Option>
+				<Option value="20">20</Option>
+		</Select>
 	</Stack>
 }
 

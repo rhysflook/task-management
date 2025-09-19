@@ -13,6 +13,8 @@ class ProjectSeeder extends Seeder
      */
     public function run(): void
     {
-        Project::factory()->count(124)->sequence(function($i) { return ['code' => $i->index . "bah"];})->create();
+        Project::withoutEvents(function() {
+            Project::factory()->count(124)->sequence(function($i) { return ['code' => $i->index . "bah"];})->create();
+        });
     }
 }

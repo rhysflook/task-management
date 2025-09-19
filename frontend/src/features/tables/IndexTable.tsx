@@ -13,13 +13,22 @@ interface TableProps {
 }
 
 const IndexTable: React.FC<TableProps> = ({ slice, containerStyles }) => {
-	let {columns, queryString, records} = useAppSelector((state) => state[slice]);
+
+	let {columns, queryString, records} = useAppSelector((state) => {
+		if (!state[slice].table) {
+			return {
+				columns: [],
+				queryString: "",
+				records: []
+			}
+		}
+		return state[slice].table;
+	});
 
 	const { isLoading } = useGetRecordsQuery(queryString, {
 		refetchOnMountOrArgChange: true,
-	  });
+	});
 
-	const headers = columns.map((column) => column.label);
 
 	return <Sheet sx={containerStyles}>
 			<Table

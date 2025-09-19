@@ -15,8 +15,9 @@ class TableTraitTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $user = \App\Models\User::factory()->create();
+        $this->actingAs($user);
         Project::factory()->count(127)->create();
-
         $this->records = Project::query()->orderBy('id')->get();
     }
     /**
@@ -30,7 +31,6 @@ class TableTraitTest extends TestCase
         $response->assertJsonCount(5, 'data');
 
     $expectedRecords = $this->records->slice(5, 5)->values()->toArray();
-        dump(array_map(fn($r) => $r['code'], $expectedRecords), array_map(fn($r) => $r['code'], $response->json('data')));
         foreach ($expectedRecords as $key => $record) {
             $this->assertEquals($record['code'], $response->json('data.' . $key . '.code'), count($this->records));
         }
@@ -41,7 +41,6 @@ class TableTraitTest extends TestCase
         $response->assertJsonCount(10, 'data');
 
         $expectedRecords = $this->records->slice(30, 10)->values()->toArray();
-        dump(array_map(fn($r) => $r['code'], $expectedRecords), array_map(fn($r) => $r['code'], $response->json('data')), count($this->records));
 
 
         foreach ($expectedRecords as $key => $record) {
@@ -54,8 +53,6 @@ class TableTraitTest extends TestCase
         $response->assertJsonCount(20, 'data');
 
         $expectedRecords = $this->records->slice(40, 20)->values()->toArray();
-        dump(array_map(fn($r) => $r['code'], $expectedRecords), array_map(fn($r) => $r['code'], $response->json('data')), count($this->records));
-
 
         foreach ($expectedRecords as $key => $record) {
             $this->assertEquals($record['code'], $response->json('data.' . $key . '.code'));

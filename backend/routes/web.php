@@ -1,19 +1,22 @@
 <?php
 
 use App\Http\Controllers\ProjectController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/api/test', [App\Http\Controllers\API\TestController::class, 'index']);
-Route::controller(ProjectController::class)->group(function() {
-	Route::prefix('api/projects')->group(function() {
-		// Route::get('tableData', 'getPage');
-		// Route::get('/', 'index');
-		// Route::get('/{project}', 'show');
-		// Route::post('/', 'store');
-		// Route::put('/{project}', 'update');
-		// Route::delete('/{project}', 'destroy');
-	});
+Route::get('/debug-stateful', function () {
+    return config('sanctum.stateful');
 });
+
+Route::middleware('web')->get('/test-session', function (Request $request) {
+    return [
+        'user' => $request->user(),
+        'session' => session()->all(),
+    ];
+});
+
+Route::get('/api/test', [App\Http\Controllers\API\TestController::class, 'index']);
+
 Route::get('/api/projects/all', function () {
 	return response()->json([
 		'projects' => [

@@ -1,4 +1,5 @@
 import { TableColumn, TableRow } from "../../types/tables/table"
+import { actionManager } from "./actionButtons";
 
 interface RowProps {
 	row: TableRow;
@@ -19,7 +20,7 @@ return <tr>
 						whiteSpace: column.overflow ? 'nowrap' : 'normal'
 					}}
 				>
-					{column.render ? column.render(row['id'] as number) : row[column.key]}
+					{column.render ? actionManager[column.render](row) : row[column.key]}
 				</td>)
 		}
 	</tr>

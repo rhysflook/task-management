@@ -17,7 +17,8 @@ export interface TableConfig {
 }
 
 export interface TableRow {
-	[key: string]: string | number | boolean;
+	id: string,
+	[key: string]: any;
 }
 
 export interface TableColumn {
@@ -28,5 +29,5 @@ export interface TableColumn {
 	overflow?: boolean;      // true = ellipsis, false = wrap
 	align?: 'left' | 'center' | 'right';
 	notDBVal?: boolean;
-	render?: (column: number) => JSX.Element; // for custom rendering
+	render?: string; // for custom rendering
 }

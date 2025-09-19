@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\HasForm;
 use App\Concerns\HasTable;
 use App\Http\Resources\ProjectCollection;
+use App\Http\Resources\ProjectResource;
 use App\Models\Project;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
-    use HasTable;
+    use HasTable, HasForm;
 
     /**
      * Display a listing of the resource.
@@ -40,7 +43,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        //
+        return new ProjectResource($project);
     }
 
     /**
@@ -65,5 +68,10 @@ class ProjectController extends Controller
     public function destroy(Project $project)
     {
         //
+    }
+
+    public function modifyUsersOptionQuery(Builder &$query)
+    {
+        $query->where('is_active', true);
     }
 }

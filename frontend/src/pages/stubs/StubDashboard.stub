@@ -1,0 +1,36 @@
+import { useParams } from "react-router-dom";
+import { useGet{cFeatureName}Query } from "../../services/{featureName}";
+import { useSelector } from "react-redux";
+import WidgetBanner from "../../components/common/WidgetBanner";
+import { Typography } from "@mui/joy";
+
+const {cFeatureName}Dashboard = () => {
+	const { id } = useParams();
+	if (!id) {
+		return <div>Error: No {featureName} ID provided.</div>;
+	}
+	const {isLoading} = useGet{cFeatureName}Query(id);
+	const {featureName} = useSelector((state) => state.{pFeatureName}.{featureName});
+
+	if (isLoading) {
+		return <div>Loading...</div>;
+	}
+
+	return (
+	<div>
+		<Typography level="h1" sx={{ margin: "2rem" }}>{{featureName}.name}</Typography>
+	  	<WidgetBanner widgets={
+			[
+	
+			]
+		}
+		width={"100%"}
+		maxBannerPerRow={5}
+		gap={8}
+		alignment="center"
+	  />
+	</div>
+  );
+}
+
+export default {cFeatureName}Dashboard;

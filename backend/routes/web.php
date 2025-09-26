@@ -3,7 +3,9 @@
 use App\Http\Controllers\ProjectController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+Route::get('/_cors_debug', function () {
+    return response()->json(config('cors'));
+});
 Route::get('/debug-stateful', function () {
     return config('sanctum.stateful');
 });

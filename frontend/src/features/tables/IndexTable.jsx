@@ -1,0 +1,64 @@
+import Sheet from '@mui/joy/Sheet';
+import Table from '@mui/joy/Table';
+import Row from './Row';
+import { useGetRecordsQuery } from '../../services/tables';
+import Navigation from './Navigation';
+import { useSelector } from 'react-redux';
+
+const IndexTable = ({ slice, containerStyles }) => {
+
+	let {columns, queryString, records} = useSelector((state) => {
+		if (!state[slice].table) {
+			return {
+				columns: [],
+				queryString: "",
+				records: []
+			}
+		}
+		return state[slice].table;
+	});
+
+	const { isLoading } = useGetRecordsQuery(queryString, {
+		refetchOnMountOrArgChange: true,
+	});
+
+	return (
+		<Sheet sx={containerStyles}>
+			<Table
+				color="neutral"
+				size="md"
+				borderAxis="both"
+				stripe="even"
+				variant="outlined"
+			>
+				{/* Table Header */}
+				<thead>
+					<tr>
+						{columns.map(
+							(column, index) =>
+								<th
+									key={index}
+									style={{
+										width: column.width,
+										textAlign: column.align,
+									}}
+								>
+									{column.label}
+								</th>
+						)}
+					</tr>
+				</thead>
+				<tbody>
+					{
+						isLoading  ?
+						<tr><td colSpan={3}>Loading...</td></tr> :
+						records.map((row, index) => (<Row key={index} row={row} columns={columns}/>))
+					}
+				</tbody>
+			</Table>
+			<Navigation position={"center"} slice={slice}/>
+		</Sheet>
+	)
+}
+
+export default IndexTable;

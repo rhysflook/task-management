@@ -49,6 +49,8 @@ trait HasForm
 
     public function createRecord(Request $request)
     {
+        \Log::info('Entered controller', $request->all());
+
         return $this->handleTransaction(function() use ($request) {
             $modelName = $this->getModelName();
             $model = "App\\Models\\$modelName";
@@ -175,11 +177,17 @@ trait HasForm
     public function getFormData(Request $request)
     {
         $id = $request->route('id'); // Retrieve 'id' from route parameters
+        $resourceClass = 'App\\Http\\Resources\\' . $this->getModelName() . 'Resource';
+        $modelClass = 'App\\Models\\' . $this->getModelName();
+
+        $record = $id
+            ? new $resourceClass($modelClass::find($id))
+            : null;
         return response()->json([
             'data' => [
                 'id' => $id,
                 'options' => $this->getRelationshipOptions($request),
-                'record' => $id ? new ProjectResource(Project::find($id)) : null,
+                'record' => $record
             ],
         ]);
     }
@@ -199,7 +207,6 @@ trait HasForm
             DB::rollBack();
             throw $e;
         } catch (\Throwable $th) {
-            dd($th);
             \Log::error($th);
             DB::rollBack();
             return response()->json([

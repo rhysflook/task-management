@@ -1,0 +1,23 @@
+import { Box } from "@mui/joy"
+import Form from "../../features/forms/Form"
+import { getFieldComponent } from "../../helpers/formFieldMap"
+import { useGetFormDataQuery } from "../../services/form"
+import { useSelector } from "react-redux";
+
+const Create{cFeatureName} = () => {
+
+	const {isLoading} = useGetFormDataQuery("{pFeatureName}/formData?{relationships}");
+
+	const { fields } = useSelector((state) => state.{pFeatureName}.form);
+
+	return <Box sx={{ margin: "2rem" }}>
+		<Form feature="{pFeatureName}" mode={"create"}>
+			{!isLoading && <>
+				{Object.values(fields).map((field) => getFieldComponent(field.type, field, "{pFeatureName}"))}
+			</>}
+
+		</Form>
+	</Box>
+}
+
+export default Create{cFeatureName}

@@ -1,0 +1,24 @@
+import { Box } from "@mui/joy"
+import Form from "../../features/forms/Form"
+import { getFieldComponent } from "../../helpers/formFieldMap"
+import { useGetRecordQuery } from "../../services/form"
+import { useParams } from "react-router-dom"
+import { useSelector } from "react-redux";
+
+const Edit{cFeatureName} = () => {
+	const { id } = useParams();
+	const {isLoading} = useGetRecordQuery(`{pFeatureName}/${id}/edit?{relationships}`);
+
+	const { fields } = useSelector((state) => state.{pFeatureName}.form);
+	console.log(fields);
+	return <Box sx={{ margin: "2rem" }}>
+		<Form feature="{pFeatureName}" mode={"edit"}>
+			{!isLoading && <>
+				{Object.values(fields).map((field) => getFieldComponent(field.type, field, "{pFeatureName}"))}
+			</>}
+
+		</Form>
+	</Box>
+}
+
+export default Edit{cFeatureName}

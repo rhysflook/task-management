@@ -1,9 +1,13 @@
 import { Autocomplete, Box, FormControl, FormHelperText, FormLabel } from "@mui/joy";
 import { useDispatch } from "react-redux";
 import { actions } from "../../../stores/store";
+import { useContext } from "react";
+import { FeatureContext } from "../../../context/FeatureContext";
 
-const MultiSelect = ({ feature, options, label, helper, sx, groups, value, id, errors }) => {
+const MultiSelect = ({ options, label, helper, sx, groups, value, id, errors }) => {
 	const dispatch = useDispatch();
+	const { feature } = useContext(FeatureContext);
+
 	const { setField } = actions[feature];
 	const allOptions = [...options, ...(groups || [])];
 	return (

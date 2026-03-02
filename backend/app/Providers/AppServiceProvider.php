@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
             if (in_array(\App\Concerns\HasTable::class, class_uses($classPath))) {
 
                 $basename = class_basename($classPath); // e.g. ProjectController
-                $resource = \Str::kebab(str_replace('Controller', '', $basename)); // "project" -> kebab-case
+                $resource = \Str::camel(str_replace('Controller', '', $basename)); // "project" -> camelCase
                 $uri = \Str::plural($resource); // "projects"
 
                 Route::get("api/$uri/tableData", [$classPath, 'getPage']);

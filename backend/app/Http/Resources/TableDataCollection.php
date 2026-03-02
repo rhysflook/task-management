@@ -6,6 +6,8 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class TableDataCollection extends ResourceCollection
 {
+
+    private $usePagination = true;
     /**
      * Transform the resource collection into an array.
      *
@@ -13,7 +15,10 @@ class TableDataCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-
+        if (!$this->usePagination) {
+            return [];
+        }
+        
         return [
             'links' => [
                 'self' => $this->path(),
@@ -27,5 +32,11 @@ class TableDataCollection extends ResourceCollection
                 'per_page' => $this->perPage(),
             ],
         ];
+    }
+
+    public function withPagination(bool $value): self
+    {
+        $this->usePagination = $value;
+        return $this;
     }
 }

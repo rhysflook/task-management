@@ -4,7 +4,8 @@ import { combineSlices } from './sliceBuilder';
 
 
 const columns = [
-  { key: 'name', label: 'Name', overflow: true },
+  { key: 'name', label: 'Name', overflow: true, searchable: true },
+  { key: 'group', label: 'Group', overflow: true, searchable: true, type: 'select' },
 ];
 
 const fields = {
@@ -17,12 +18,30 @@ const fields = {
       required: true,
       sx: {width: "20%", marginTop: "2rem"}
    },
+   'group': {
+      label: "Group",
+      id: "group",
+      type: "select",
+      value: null,
+      // optionsEndpoint: exampleApi.endpoints.getGroups,
+      options: [{id: 1, name: "Group 1"}, {id: 2, name: "Group 2"}],
+      helper: "Select the group for the example",
+      required: true,
+      sx: {width: "20%", marginTop: "2rem"}
+   }
 }
+
+const actions = [
+  'edit',
+  'show',
+];
+
 // Define the initial state using that type
 const initialState = {
   // ...getFeatureInitialState(['table']),
   name: 'examples',
   columns,
+  actions,
   fields,
 }
 

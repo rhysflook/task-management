@@ -1,19 +1,28 @@
-import { Box } from "@mui/joy"
+import { Box, Button } from "@mui/joy"
 import Form from "../../features/forms/Form"
 import { getFieldComponent } from "../../helpers/formFieldMap"
 import { useGetFormDataQuery } from "../../services/form"
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { FeatureContext } from "../../context/FeatureContext";
 
 const Create{cFeatureName} = () => {
+	const { feature } = useContext(FeatureContext);
 
-	const {isLoading} = useGetFormDataQuery("{pFeatureName}/formData?{relationships}");
+	const {isLoading} = useGetFormDataQuery(`${feature}/formData?{relationships}`);
 
 	const { fields } = useSelector((state) => state.{pFeatureName}.form);
 
+	const navigate = useNavigate();
+
 	return <Box sx={{ margin: "2rem" }}>
-		<Form feature="{pFeatureName}" mode={"create"}>
+		<Button onClick={() => navigate(`/${feature}/list`)}>
+			List
+		</Button>
+		<Form feature={feature} mode={"create"}>
 			{!isLoading && <>
-				{Object.values(fields).map((field) => getFieldComponent(field.type, field, "{pFeatureName}"))}
+				{Object.values(fields).map((field) => getFieldComponent(field.type, field))}
 			</>}
 
 		</Form>

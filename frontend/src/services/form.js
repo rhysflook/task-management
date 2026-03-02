@@ -11,11 +11,10 @@ function getCookieValue(name) {
 export const formApi = createApi({
 	reducerPath: 'formApi',
 	baseQuery: fetchBaseQuery({
-		baseUrl: 'http://localhost:8000/api/',
+		baseUrl: import.meta.env.VITE_API_URL + 'api/' || 'http://localhost:8000/api/',
 		credentials: 'include', // 👈 Send cookies (e.g. for Laravel Sanctum)
 		prepareHeaders: (headers) => {
 			const xsrfToken = getCookieValue('XSRF-TOKEN');
-			console.log("XSRF-TOKEN:", xsrfToken);
 			if (xsrfToken) {
 				headers.set('X-XSRF-TOKEN', xsrfToken);
 			}
@@ -28,6 +27,7 @@ export const formApi = createApi({
 		}),
 		getFormData: builder.query({
 			query: (url) => url,
+			keepUnusedDataFor: 0,   
 		}),
 		getRecord: builder.query({
 			query: (url) => ({
@@ -38,6 +38,7 @@ export const formApi = createApi({
 					'Accept': 'application/json',
 				},
 			}),
+			keepUnusedDataFor: 0,
 		}),
 		createRecord: builder.mutation({
 			query: ({ url, data }) => ({

@@ -1,0 +1,42 @@
+[
+    {
+        "label": "Beds",
+        "path": "/beds"
+    },
+    {
+        "label": "Clients",
+        "path": "/clients"
+    },
+    {
+        "label": "Examples",
+        "path": "/examples/list"
+    },
+    {
+        "label": "Extensions",
+        "path": "/extensions"
+    },
+    {
+        "label": "Patients",
+        "path": "/patients/list"
+    },
+    {
+        "label": "RingGroups",
+        "path": "/ringGroups"
+    },
+    {
+        "label": "Staff",
+        "path": "/staff"
+    },
+    {
+        "label": "サーバーログ確認",
+        "path": "/servers/list"
+    },
+    {
+        "label": "ユニットマップ",
+        "path": "/unitMaps/list"
+    },
+    {
+        "label": "ログ確認",
+        "path": "/logs/list"
+    }
+]

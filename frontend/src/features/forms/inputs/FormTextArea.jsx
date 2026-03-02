@@ -1,8 +1,12 @@
 import { Box, FormControl, FormHelperText, FormLabel, Textarea } from "@mui/joy"
 import { useDispatch } from "react-redux";
 import { actions } from "../../../stores/store";
+import { useContext } from "react";
+import { FeatureContext } from "../../../context/FeatureContext";
 
-const FormTextArea = ({id, feature, label, helper, sx, errors, value}) => {
+const FormTextArea = ({id, label, helper, sx, errors, value}) => {
+	const { feature } = useContext(FeatureContext);
+
 	const { setField } = actions[feature];
 	const dispatch = useDispatch();
 	return (

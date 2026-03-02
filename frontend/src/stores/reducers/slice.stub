@@ -18,11 +18,17 @@ const fields = {
       sx: {width: "20%", marginTop: "2rem"}
    },
 }
+
+const actions = [
+  // Add actions here (e.g. 'edit')
+];
+
 // Define the initial state using that type
 const initialState = {
   // ...getFeatureInitialState(['table']),
   name: '{pFeatureName}',
   columns,
+  actions,
   fields,
 }
 

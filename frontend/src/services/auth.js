@@ -11,7 +11,7 @@ function getCookieValue(name) {
 export const authApi = createApi({
 	reducerPath: 'authApi',
 	baseQuery: fetchBaseQuery({
-		baseUrl: 'http://localhost:8000/',
+		baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000/',
 		credentials: 'include',
 		prepareHeaders: (headers) => {
 			const xsrfToken = getCookieValue('XSRF-TOKEN');
@@ -30,7 +30,7 @@ export const authApi = createApi({
 		}),
 		login: builder.mutation({
 			query: (credentials) => ({
-				url: 'api/login',
+				url: 'login',
 				method: 'POST',
 				credentials: 'include',
 				headers: {
@@ -50,7 +50,7 @@ export const authApi = createApi({
 		}),
 		logout: builder.mutation({
 			query: () => ({
-				url: 'api/logout',
+				url: 'logout',
 				method: 'POST',
 				credentials: 'include'
 			}),

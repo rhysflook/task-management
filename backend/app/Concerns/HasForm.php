@@ -6,6 +6,8 @@ use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 trait HasForm
 {
@@ -22,18 +24,37 @@ trait HasForm
      */
     public function getOptions(string $relationship): array
     {
+        $parts = explode(':', $relationship);
+        if (count($parts) >= 3) {
+            [$relationship, $name] = $parts;
+        } else {
+            [$relationship, $name] = array_pad($parts, 2, 'name');
+        }
         $capitalizedRelationship = ucfirst($relationship);
-        $relationship = \Str::singular($capitalizedRelationship);
+        $relationship = Str::singular($capitalizedRelationship);
+        // Handle cases like 'category_id'
+        if (str_ends_with($relationship, '_id')) {
+            $relationship = substr($relationship, 0, -3);
+        }
+        $capitalizedRelationship = ucfirst($relationship);
+        $relationship = Str::singular($capitalizedRelationship);
+        // Handle cases like 'category_id'
         $model = "App\\Models\\$relationship";
 
         $query = $model::query();
+   
         if (method_exists($this, "modify{$capitalizedRelationship}OptionQuery")) {
             $this->{"modify{$capitalizedRelationship}OptionQuery"}($query);
         }
-
-        return $query->get()->map(function ($item) {
-            return ['id' => $item->id, 'name' => $item->name];
+        \Log::info('Option Query', ['query' => $query->toSql(), 'bindings' => $query->getBindings()]);
+        return $query->get()->map(function ($item) use ($name, $capitalizedRelationship) {
+            return [
+                'id' => $item->id,
+                'name' => $item->{trim($name)},
+                ...(method_exists($this, "set{$capitalizedRelationship}OptionData") ? $this->{"set{$capitalizedRelationship}OptionData"}($item) : [])
+            ];
         })->toArray();
+        return $test;
     }
 
     /**
@@ -49,7 +70,7 @@ trait HasForm
 
     public function createRecord(Request $request)
     {
-        \Log::info('Entered controller', $request->all());
+        Log::info('Entered controller', $request->all());
 
         return $this->handleTransaction(function() use ($request) {
             $modelName = $this->getModelName();
@@ -63,6 +84,7 @@ trait HasForm
             // beforeRelationshipCreation hook
 
             $this->handleRelationships($record, $request->input('relationships', []));
+            $this->handleAfterCreateHook($request, $record);
             return $record;
             // afterCreation hook
         },
@@ -70,6 +92,13 @@ trait HasForm
             'Failed to create record',
             201
         );
+    }
+
+    public function handleAfterCreateHook(Request $request, $record)
+    {
+        if (method_exists($this, 'afterCreate')) {
+            $this->afterCreate($request, $record);
+        }
     }
 
     public function editRecord(Request $request)
@@ -80,6 +109,7 @@ trait HasForm
             $this->handleValidation($modelName, $request);
 
             // beforeCreate hook
+            $this->handleBeforeUpdateHook($request);
 
             $record = tap($model::find($request->route('id')), function($record) use ($request) {
                 $record->update($request->all());
@@ -88,12 +118,27 @@ trait HasForm
             // beforeRelationshipCreation hook
 
             $this->handleRelationships($record, $request->input('relationships', []));
+            $this->handleAfterUpdateHook($request, $record);
             return $record;
             // afterCreation hook
         },
             'Successfully updated record',
             'Failed to updated record',
         );
+    }
+
+    public function handleBeforeUpdateHook(Request $request)
+    {
+        if (method_exists($this, 'beforeUpdate')) {
+            $this->beforeUpdate($request);
+        }
+    }
+
+    public function handleAfterUpdateHook(Request $request, $record)
+    {
+        if (method_exists($this, 'afterUpdate')) {
+            $this->afterUpdate($request, $record);
+        }
     }
 
     public function deleteRecord(Request $request)
@@ -117,7 +162,7 @@ trait HasForm
     public function handleValidation(string $model, $request)
     {
         // Construct the FormRequest class name dynamically.
-        $formRequestClass = 'App\\Http\\Requests\\' . \Str::studly($model) . 'Request';
+        $formRequestClass = 'App\\Http\\Requests\\' . Str::studly($model) . 'Request';
 
         // Check if the class exists, and instantiate it.
         if (class_exists($formRequestClass)) {
@@ -183,12 +228,26 @@ trait HasForm
         $record = $id
             ? new $resourceClass($modelClass::find($id))
             : null;
+
+        if (method_exists($this, 'getExtraData')) {
+            $extra_data = $this->getExtraData();
+        }
+
+        if (method_exists($this, 'modifyFormDataRecord')) {
+            $record = $this->modifyFormDataRecord($record);
+        }
+        $response_data = [
+            'id' => $id,
+            'options' => $this->getRelationshipOptions($request),
+            'record' => $record,
+            'extra_data' => $extra_data ?? [],
+        ];
+
+        if (method_exists($this, 'modifyFormDataResponse')) {
+            $response_data = $this->modifyFormDataResponse($response_data);
+        }
         return response()->json([
-            'data' => [
-                'id' => $id,
-                'options' => $this->getRelationshipOptions($request),
-                'record' => $record
-            ],
+            'data' => $response_data,
         ]);
     }
 
@@ -207,7 +266,7 @@ trait HasForm
             DB::rollBack();
             throw $e;
         } catch (\Throwable $th) {
-            \Log::error($th);
+            Log::error($th);
             DB::rollBack();
             return response()->json([
             'error' => $errorMsg,
@@ -219,5 +278,18 @@ trait HasForm
             'data' => $result,
             'message' => $successMsg,
         ], $successCode);
+    }
+
+    public function resolveModelInstance()
+    {
+        $modelName = $this->getModelName();
+        $model = "App\\Models\\$modelName";
+        $key;
+        if (request()->has('record')) {
+            $key = request()->query('record');
+        } else {
+            $key = request()->route('id');
+        }
+        return $model::find($key);
     }
 }

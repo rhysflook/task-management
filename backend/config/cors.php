@@ -14,7 +14,7 @@ return [
     | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
     |
     */
-    'paths' => ['api/*', 'sanctum/*', 'login', 'logout', 'register', 'balls/*'],
+    'paths' => ['api/*', 'sanctum/*', 'login', 'logout', 'register', 'balls/*', 'broadcasting/auth'],
     'allowed_methods' => ['*'],
     'allowed_origins' => ['http://localhost:5173'],
     // 'allowed_origins_patterns' => [],    

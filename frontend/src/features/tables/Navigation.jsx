@@ -1,21 +1,24 @@
-import React from "react";
+import React, { useContext } from "react";
 import { actions } from "../../stores/store";
 import { Button, Option, Select, Stack } from "@mui/joy";
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { useDispatch, useSelector } from "react-redux";
+import { FeatureContext } from "../../context/FeatureContext";
 
-const Navigation = ({ position = 'center', slice }) => {
-	const { getPage, setPerPage } = actions[slice];
+const Navigation = ({ position = 'center' }) => {
+	const { feature } = useContext(FeatureContext);
+
+	const { getPage, setPerPage } = actions[feature];
 	const { last_page, current_page, per_page } = useSelector((state) => {
-		if (!state[slice].table) {
+		if (!state[feature].table) {
 			return {
 				last_page: 1,
 				current_page: 1,
-				per_page: 5
+				per_page: 50
 			}
 		}
-		return state[slice].table.meta
+		return state[feature].table.meta
 	});
 	const dispatch = useDispatch();
 	const visibleBtns = () => {
@@ -46,7 +49,7 @@ const Navigation = ({ position = 'center', slice }) => {
 	}
 
 	return (
-		<Stack direction="row" sx={{ width: "100%", justifyContent: position, alignItems: "center", marginTop: "20px" }}>
+		<Stack direction="row" sx={{ width: "100%", justifyContent: position, alignItems: "center", marginTop: "5px" }}>
 			{current_page > 1 && (
 				<Button id="prev-btn" onClick={() => { dispatch(getPage(current_page - 1)) }}>
 					<ArrowLeftIcon />
@@ -58,7 +61,7 @@ const Navigation = ({ position = 'center', slice }) => {
 					<ArrowRightIcon />
 				</Button>
 			)}
-			<Select
+			{/* <Select
 				sx={{
 					width: "100px",
 					marginLeft: "20px",
@@ -71,10 +74,10 @@ const Navigation = ({ position = 'center', slice }) => {
 					}
 				}}
 			>
-				<Option value="5">5</Option>
-				<Option value="10">10</Option>
-				<Option value="20">20</Option>
-			</Select>
+				<Option value="30">30</Option>
+				<Option value="40">40</Option>
+				<Option value="50">50</Option>
+			</Select> */}
 		</Stack>
 	)
 }
